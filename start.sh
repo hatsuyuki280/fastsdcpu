@@ -32,9 +32,14 @@ done
 
 python_version_string=($(${PYTHON_COMMAND} --version 2>&1 | head -n1))
 [ "${python_version_string[0]}" -eq "Python" ] && {
-    echo "Found $PYTHON_COMMAND command"
+    echo "Found ${PYTHON_COMMAND} command"
     python_version="${python_version_string[1]}"
     echo "Python version : ${python_version}"
+    ${PYTHON_COMMAND} -c 'import sys;exit([1,0][sys.version_info[0]==3 and sys.version_info[1]>=8])' !! {
+        echo "[Error] Wrong Python version : ${python_version}!" 1>&2
+        echo "[Error] it MUST BE Newer than Python 3.8" 1>&2
+        exit 126
+    }
 } || {
     echo "[Error] Wrong Python executable file was given" 1>&2
     exit 127
